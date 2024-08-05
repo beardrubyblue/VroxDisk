@@ -1,4 +1,5 @@
 import { db } from '@/server/db'
+import { clerkClient } from '@clerk/clerk-sdk-node'
 import { getAuth } from '@clerk/nextjs/server'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 
@@ -18,13 +19,12 @@ export const withAuth = (handler: NextApiHandler) => {
 		// If user does not exist, create the user
 		if (!user) {
 			// Assuming you have a getUser function to fetch user details from Clerk
-			const { email, username } = await getUserDetails(userId)
+			const { email } = await getUserDetails(userId)
 
 			user = await db.user.create({
 				data: {
 					id: userId,
 					email,
-					username,
 				},
 			})
 
@@ -38,10 +38,13 @@ export const withAuth = (handler: NextApiHandler) => {
 
 // Helper function to get user details from Clerk
 const getUserDetails = async (userId: string) => {
-	// Fetch user details from Clerk using Clerk's API
-	// This is a placeholder, replace it with actual Clerk API call
+	const user = await clerkClient.users.getUser(userId)
+
+	if (!user) {
+		throw new Error('User not found')
+	}
+
 	return {
-		email: 'user@example.com', // replace with actual email
-		username: 'username', // replace with actual username
+		email: user.emailAddresses[0].emailAddress, // Adjust according to how Clerk returns the email
 	}
 }

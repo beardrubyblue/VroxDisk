@@ -11,6 +11,7 @@ const bucketName = env.S3_BUCKET_NAME
 type ProcessedFiles = Array<[string, File]>
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+	const { userId } = req
 	let status = 200,
 		resultBody = { status: 'ok', message: 'Files were uploaded successfully' }
 
@@ -54,6 +55,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 							fileName,
 							originalName: fileObject?.originalFilename ?? fileName,
 							size: fileObject?.size ?? 0,
+							userId: String(userId),
 						},
 					})
 				})

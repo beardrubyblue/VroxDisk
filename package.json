@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^5.0.23",
     "@clerk/nextjs": "^5.2.12",
     "@prisma/client": "^5.17.0",
     "@t3-oss/env-nextjs": "^0.11.0",
@@ -19,6 +20,7 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/formidable": "^3.4.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

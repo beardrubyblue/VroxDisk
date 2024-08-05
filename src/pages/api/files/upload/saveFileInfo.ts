@@ -34,15 +34,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 				bucket: env.S3_BUCKET_NAME,
 				fileName: file.fileNameInBucket,
 				originalName: file.originalFileName,
-				size: BigInt(file.fileSize), // Ensure the size is stored as BigInt
-				userId: userId, // Ensure userId is being correctly assigned
+				size: BigInt(file.fileSize),
+				userId: String(userId),
 			})),
 		})
 
 		console.log('Save files result:', saveFilesInfo)
 
 		res.status(200).json({ message: 'Files saved successfully' })
-	} catch (error) {
+	} catch (error: any) {
 		console.error('Error saving files:', error)
 		res
 			.status(500)

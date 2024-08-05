@@ -1,40 +1,47 @@
 export type ShortFileProp = {
-  originalFileName: string;
-  fileSize: number;
-};
+	originalFileName: string
+	fileSize: number
+}
 
 export type PresignedUrlProp = ShortFileProp & {
-  url: string;
-  fileNameInBucket: string;
-};
+	url: string
+	fileNameInBucket: string
+}
 
 export type FileProps = ShortFileProp & {
-  id: string;
-  isDeleting?: boolean;
-};
+	id: string
+	isDeleting?: boolean
+}
 
 export type FilesListProps = {
-  files: FileProps[];
-  fetchFiles: () => Promise<void>;
-  setFiles: (
-    files: FileProps[] | ((files: FileProps[]) => FileProps[]),
-  ) => void;
-  downloadUsingPresignedUrl: boolean;
-};
+	files: FileProps[]
+	fetchFiles: () => Promise<void>
+	setFiles: (files: FileProps[] | ((files: FileProps[]) => FileProps[])) => void
+	downloadUsingPresignedUrl: boolean
+}
 
 export type LoadSpinnerProps = {
-  size?: "small" | "medium" | "large";
-};
+	size?: 'small' | 'medium' | 'large'
+}
 
 export type UploadFilesFormUIProps = {
-  isLoading: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  uploadToServer: (event: React.FormEvent<HTMLFormElement>) => void;
-  maxFileSize: number;
-};
+	isLoading: boolean
+	fileInputRef: React.RefObject<HTMLInputElement>
+	uploadToServer: (event: React.FormEvent<HTMLFormElement>) => void
+	maxFileSize: number
+}
 
 export type FileInDBProp = {
-  fileNameInBucket: string;
-  originalFileName: string;
-  fileSize: number;
-};
+	fileNameInBucket: string
+	originalFileName: string
+	fileSize: number
+}
+
+// src/types/next-auth.d.ts
+import type { NextApiRequest } from 'next'
+
+declare module 'next' {
+	interface NextApiRequest {
+		userId?: string
+	}
+}
