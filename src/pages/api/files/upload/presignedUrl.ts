@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const { userId } = req
 	console.log(req.method)
 	if (req.method !== 'POST') {
-		res.status(405).json({ message: 'Only POSTT requests are allowed' })
+		res.status(405).json({ message: 'Only POST requests are allowed' })
 		return
 	}
 
