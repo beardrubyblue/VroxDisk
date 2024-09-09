@@ -1,8 +1,8 @@
-import type { PresignedUrlProp, ShortFileProp } from "./types";
+import type { PresignedUrlProp, ShortFileProp } from './types'
 
-export const MAX_FILE_SIZE_NEXTJS_ROUTE = 4;
-export const MAX_FILE_SIZE_S3_ENDPOINT = 10000;
-export const FILE_NUMBER_LIMIT = 10;
+export const MAX_FILE_SIZE_NEXTJS_ROUTE = 4
+export const MAX_FILE_SIZE_S3_ENDPOINT = 10000
+export const FILE_NUMBER_LIMIT = 10
 
 /**
  *
@@ -10,19 +10,19 @@ export const FILE_NUMBER_LIMIT = 10;
  * @returns true if all files are valid
  */
 export function validateFiles(
-  files: ShortFileProp[],
-  maxSizeMB: number,
+	files: ShortFileProp[],
+	maxSizeMB: number
 ): string | undefined {
-  // check if all files in total are less than 100 MB
-  const totalFileSize = files.reduce((acc, file) => acc + file.fileSize, 0);
-  const isFileSizeValid = totalFileSize < maxSizeMB * 1024 * 1024;
-  if (!isFileSizeValid) {
-    return `Total file size should be less than ${maxSizeMB} MB`;
-  }
-  if (files.length > FILE_NUMBER_LIMIT) {
-    return `You can upload maximum ${FILE_NUMBER_LIMIT} files at a time`;
-  }
-  return;
+	// check if all files in total are less than 100 MB
+	const totalFileSize = files.reduce((acc, file) => acc + file.fileSize, 0)
+	const isFileSizeValid = totalFileSize < maxSizeMB * 1024 * 1024
+	if (!isFileSizeValid) {
+		return `Total file size should be less than ${maxSizeMB} MB`
+	}
+	if (files.length > FILE_NUMBER_LIMIT) {
+		return `You can upload maximum ${FILE_NUMBER_LIMIT} files at a time`
+	}
+	return
 }
 
 /**
@@ -31,15 +31,15 @@ export function validateFiles(
  * @returns
  */
 export const getPresignedUrls = async (files: ShortFileProp[]) => {
-  const response = await fetch("/api/files/upload/presignedUrl", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(files),
-  });
-  return (await response.json()) as PresignedUrlProp[];
-};
+	const response = await fetch('/api/files/upload/presignedUrl', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(files),
+	})
+	return (await response.json()) as PresignedUrlProp[]
+}
 
 /**
  * Uploads file to S3 directly using presigned url
@@ -48,44 +48,44 @@ export const getPresignedUrls = async (files: ShortFileProp[]) => {
  * @returns  response from S3
  */
 export const uploadToS3 = async (
-  presignedUrl: PresignedUrlProp,
-  file: File,
+	presignedUrl: PresignedUrlProp,
+	file: File
 ) => {
-  try {
-    console.log(`Uploading to URL: ${presignedUrl.url}`);
-    const response = await fetch(presignedUrl.url, {
-      method: "PUT",
-      body: file,
-      headers: {
-        "Content-Type": file.type,
-      },
-    });
+	try {
+		console.log(`Uploading to URL: ${presignedUrl.url}`)
+		const response = await fetch(presignedUrl.url, {
+			method: 'PUT',
+			body: file,
+			headers: {
+				'Content-Type': file.type,
+			},
+		})
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`)
+		}
 
-    console.log("File uploaded successfully");
-    return response;
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    throw error; // Ретрайт ошибки, чтобы внешний код мог обработать ее
-  }
-};
+		console.log('File uploaded successfully')
+		return response
+	} catch (error) {
+		console.error('Error uploading file:', error)
+		throw error // Ретрайт ошибки, чтобы внешний код мог обработать ее
+	}
+}
 /**
  * Saves file info in DB
  * @param presignedUrls presigned urls for uploading
  * @returns
  */
 export const saveFileInfoInDB = async (presignedUrls: PresignedUrlProp[]) => {
-  return await fetch("/api/files/upload/saveFileInfo", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(presignedUrls),
-  });
-};
+	return await fetch('/api/files/upload/saveFileInfo', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(presignedUrls),
+	})
+}
 
 /**
  * Uploads files to S3 and saves file info in DB
@@ -95,32 +95,32 @@ export const saveFileInfoInDB = async (presignedUrls: PresignedUrlProp[]) => {
  * @returns
  */
 export const handleUpload = async (
-  files: File[],
-  presignedUrls: PresignedUrlProp[],
-  onUploadSuccess: () => void,
+	files: File[],
+	presignedUrls: PresignedUrlProp[],
+	onUploadSuccess: () => void
 ) => {
-  const uploadToS3Response = await Promise.all(
-    presignedUrls.map((presignedUrl) => {
-      const file = files.find(
-        (file) =>
-          file.name === presignedUrl.originalFileName &&
-          file.size === presignedUrl.fileSize,
-      );
-      if (!file) {
-        throw new Error("File not found");
-      }
-      return uploadToS3(presignedUrl, file);
-    }),
-  );
+	const uploadToS3Response = await Promise.all(
+		presignedUrls.map(presignedUrl => {
+			const file = files.find(
+				file =>
+					file.name === presignedUrl.originalFileName &&
+					file.size === presignedUrl.fileSize
+			)
+			if (!file) {
+				throw new Error('File not found')
+			}
+			return uploadToS3(presignedUrl, file)
+		})
+	)
 
-  if (uploadToS3Response.some((res) => res.status !== 200)) {
-    alert("Upload failed");
-    return;
-  }
+	if (uploadToS3Response.some(res => res.status !== 200)) {
+		alert('Upload failed')
+		return
+	}
 
-  await saveFileInfoInDB(presignedUrls);
-  onUploadSuccess();
-};
+	await saveFileInfoInDB(presignedUrls)
+	onUploadSuccess()
+}
 
 /**
  *
@@ -129,12 +129,12 @@ export const handleUpload = async (
  * @returns formatted string
  */
 export function formatBytes(bytes: number, decimals = 2) {
-  if (bytes === 0) return "0 Bytes";
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+	if (bytes === 0) return '0 Bytes'
+	const k = 1024
+	const dm = decimals < 0 ? 0 : decimals
+	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+	const i = Math.floor(Math.log(bytes) / Math.log(k))
+	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
 /**
@@ -143,9 +143,9 @@ export function formatBytes(bytes: number, decimals = 2) {
  * @returns FormData object
  */
 export function createFormData(files: File[]): FormData {
-  const formData = new FormData();
-  files.forEach((file) => {
-    formData.append("file", file);
-  });
-  return formData;
+	const formData = new FormData()
+	files.forEach(file => {
+		formData.append('file', file)
+	})
+	return formData
 }

@@ -1,7 +1,6 @@
 import { env } from '@/env.js'
 import * as Minio from 'minio'
 import type internal from 'stream'
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 export const s3Client = new Minio.Client({
 	endPoint: env.S3_ENDPOINT,
 	port: env.S3_PORT ? Number(env.S3_PORT) : undefined,
